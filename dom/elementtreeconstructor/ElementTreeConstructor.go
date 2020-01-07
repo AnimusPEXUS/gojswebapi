@@ -23,7 +23,7 @@ func (self *ElementTreeConstructor) CreateTextNode(
 
 func (self *ElementTreeConstructor) CreateElement(
 	name string,
-	attributes [][2]string,
+	attributes []*dom.Attribute,
 	children []*dom.Node,
 ) *dom.Element {
 	return self.CreateElementNS(nil, name, attributes, children)
@@ -32,7 +32,7 @@ func (self *ElementTreeConstructor) CreateElement(
 func (self *ElementTreeConstructor) CreateElementNS(
 	namespace *string,
 	name string,
-	attributes [][2]string,
+	attributes []*dom.Attribute,
 	children []*dom.Node,
 ) *dom.Element {
 
@@ -42,6 +42,14 @@ func (self *ElementTreeConstructor) CreateElementNS(
 		ret = self.document.CreateElementNS(*namespace, name)
 	} else {
 		ret = self.document.CreateElement(name)
+	}
+
+	for _, i := range attributes {
+		if i.Namespace == nil {
+			ret.SetAttribute(i.Name, i.Value)
+		} else {
+			ret.SetAttributeNS(*i.Namespace, i.Name, i.Value)
+		}
 	}
 
 	for _, i := range children {
