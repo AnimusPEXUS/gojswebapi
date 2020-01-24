@@ -14,11 +14,11 @@ func NewDocumentFromJsValue(jsvalue js.Value) *Document {
 }
 
 func (self *Document) CreateElementNS(ns string, name string) *Element {
-	return &Element{self.Value.Call("createElementNS", ns, name, js.Undefined())}
+	return &Element{Node{self.Value.Call("createElementNS", ns, name, js.Undefined())}}
 }
 
 func (self *Document) CreateElement(name string) *Element {
-	return &Element{self.Value.Call("createElement", name, js.Undefined())}
+	return &Element{Node{self.Value.Call("createElement", name, js.Undefined())}}
 
 }
 

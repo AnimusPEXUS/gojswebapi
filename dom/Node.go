@@ -4,6 +4,10 @@ import (
 	"syscall/js"
 )
 
+type ToNodeConvertable interface {
+	AsNode() *Node
+}
+
 type Node struct {
 	js.Value
 }
@@ -28,6 +32,28 @@ func (self *Node) RemoveChild(c *Node) *Node {
 	return &Node{self.Value.Call("removeChild", c.Value)}
 }
 
-// func (self *Node) RemoveAllChildren() {
-// 	self.Value.Call("removeAllChildren")
-// }
+func (self *Node) ParentNode() *Node {
+	t := self.Get("parentNode")
+	if t == js.Null() || t == js.Undefined() {
+		return nil
+	}
+	return &Node{t}
+}
+
+func (self *Node) ParentElement() *Element {
+	t := self.Get("parentElement")
+	if t == js.Null() || t == js.Undefined() {
+		return nil
+	}
+	return &Element{Node{t}}
+}
+
+func (self *Node) AsNode() *Node {
+	return self
+}
+
+func (self *Node) RemoveAllChildren() {
+	for a := self.GetFirstChild(); a != nil; a = self.GetFirstChild() {
+		self.RemoveChild(a)
+	}
+}

@@ -21,20 +21,11 @@ func (self *ElementTreeConstructor) CreateTextNode(
 	return self.document.NewTextNode(text)
 }
 
-func (self *ElementTreeConstructor) CreateElement(
-	name string,
-	attributes []*dom.Attribute,
-	children []*dom.Node,
-) *dom.Element {
-	return self.CreateElementNS(nil, name, attributes, children)
+func (self *ElementTreeConstructor) CreateElement(name string) *ElementMutator {
+	return self.CreateElementNS(nil, name)
 }
 
-func (self *ElementTreeConstructor) CreateElementNS(
-	namespace *string,
-	name string,
-	attributes []*dom.Attribute,
-	children []*dom.Node,
-) *dom.Element {
+func (self *ElementTreeConstructor) CreateElementNS(namespace *string, name string) *ElementMutator {
 
 	var ret *dom.Element
 
@@ -44,22 +35,10 @@ func (self *ElementTreeConstructor) CreateElementNS(
 		ret = self.document.CreateElement(name)
 	}
 
-	for _, i := range attributes {
-		if i.Namespace == nil {
-			ret.SetAttribute(i.Name, i.Value)
-		} else {
-			ret.SetAttributeNS(*i.Namespace, i.Name, i.Value)
-		}
-	}
-
-	for _, i := range children {
-		ret.Append(i)
-	}
-
-	return ret
+	return NewElementMutatorFromElement(ret)
 }
 
-func (self *ElementTreeConstructor) ReplaceChildren(new_children []*dom.Node) {
+func (self *ElementTreeConstructor) ReplaceChildren(new_children []dom.ToNodeConvertable) {
 
 	n := &dom.Node{self.document.Value}
 
@@ -69,7 +48,7 @@ func (self *ElementTreeConstructor) ReplaceChildren(new_children []*dom.Node) {
 
 	for _, i := range new_children {
 		// log.Println("appending child", i, i.Value)
-		n.AppendChild(i)
+		n.AppendChild(i.AsNode())
 	}
 
 }
