@@ -141,6 +141,10 @@ func (self *ElementMutator) GetJsValue(property string) js.Value {
 	return self.Element.Node.Value.Get(property)
 }
 
+func (self *ElementMutator) SelfJsValue() js.Value {
+	return self.Element.Node.Value
+}
+
 func (self *ElementMutator) GetAssign(property string, ret *interface{}) *ElementMutator {
 	t := self.Element.Node.Value.Get(property)
 	if ret != nil {

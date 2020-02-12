@@ -18,7 +18,7 @@ type Select00 struct {
 
 func NewSelect00(
 	document *pexu_dom.Document,
-	values map[string]string,
+	values [][2]string,
 	preselected string,
 	onchange func(),
 ) *Select00 {
@@ -29,18 +29,10 @@ func NewSelect00(
 
 	etc := elementtreeconstructor.NewElementTreeConstructor(document)
 
-	t := etc.CreateElement("select").
-		AssignSelf(&self.value_select).
-		AppendChildren(
-			etc.
-				CreateElement("option").
-				AppendChildren(
-					etc.CreateTextNode("main title text"),
-				),
-		)
+	self.value_select = etc.CreateElement("select")
 
-	for k, v := range values {
-		self.AppendOption(k, v)
+	for _, i := range values {
+		self.AppendOption(i[0], i[1])
 	}
 
 	if preselected != "" {
@@ -61,7 +53,7 @@ func NewSelect00(
 		),
 	)
 
-	self.Element = t.Element
+	self.Element = self.value_select.Element
 
 	return self
 }
