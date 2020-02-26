@@ -1,4 +1,4 @@
-package select00
+package widgetcollection
 
 import (
 	"syscall/js"
@@ -50,6 +50,11 @@ func NewSelect00(
 
 	self.Element = self.value_select
 
+	return self
+}
+
+func (self *Select00) AssignSelf(ref **Select00) *Select00 {
+	*ref = self
 	return self
 }
 

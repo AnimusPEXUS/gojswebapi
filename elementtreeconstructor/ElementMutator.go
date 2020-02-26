@@ -6,6 +6,8 @@ import (
 	"github.com/AnimusPEXUS/wasmtools/dom"
 )
 
+var _ dom.ToNodeConvertable = &ElementMutator{}
+
 type ElementMutator struct {
 	Element *dom.Element
 }
@@ -25,23 +27,12 @@ func NewElementMutatorFromElement(e *dom.Element) *ElementMutator {
 	return ret
 }
 
-func (self *ElementMutator) AppendChildren(children ...interface{}) *ElementMutator {
+func (self *ElementMutator) AppendChildren(children ...dom.ToNodeConvertable) *ElementMutator {
 
 	// FIXME: append and remove operations have to be done at Node level
 
 	for _, i := range children {
-
-		switch i.(type) {
-		default:
-			panic("unsupported type")
-		case *ElementMutator:
-			self.Element.Append(i.(*ElementMutator).Element.AsNode())
-		case *dom.Element:
-			self.Element.Append(i.(*dom.Element).AsNode())
-		case *dom.Node:
-			self.Element.Append(i.(*dom.Node))
-		}
-
+		self.Element.Append(i.AsNode())
 	}
 	return self
 }
@@ -51,31 +42,16 @@ func (self *ElementMutator) RemoveChildren() *ElementMutator {
 	return self
 }
 
-func (self *ElementMutator) Remove(children ...interface{}) *ElementMutator {
-
+func (self *ElementMutator) Remove(children ...dom.ToNodeConvertable) *ElementMutator {
 	// FIXME: append and remove operations have to be done at Node level
-
 	for _, i := range children {
-		var n *dom.Node
-		switch i.(type) {
-		default:
-			panic("unsupported type")
-		case *ElementMutator:
-			n = i.(*ElementMutator).Element.AsNode()
-		case *dom.Element:
-			n = i.(*dom.Element).AsNode()
-		case *dom.Node:
-			n = (i.(*dom.Node))
-		}
-
-		self.Element.RemoveChild(n)
-
+		self.Element.RemoveChild(i.AsNode())
 	}
 	return self
 }
 
 func (self *ElementMutator) RemoveFromParent() *ElementMutator {
-	self.Parent().Remove(self)
+	self.Parent().Remove(self.AsNode())
 	return self
 }
 
@@ -174,10 +150,10 @@ func (self *ElementMutator) AddEventListener(
 	return self
 }
 
-func (self *ElementMutator) ToDomElement() *dom.Element {
+func (self *ElementMutator) AsElement() *dom.Element {
 	return self.Element
 }
 
-func (self *ElementMutator) ToDomNode() *dom.Node {
-	return self.ToDomElement().AsNode()
+func (self *ElementMutator) AsNode() *dom.Node {
+	return self.AsElement().AsNode()
 }
