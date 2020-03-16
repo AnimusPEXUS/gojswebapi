@@ -27,6 +27,11 @@ func NewElementMutatorFromElement(e *dom.Element) *ElementMutator {
 	return ret
 }
 
+func NewElementMutatorFromNode(n *dom.Node) *ElementMutator {
+	ret := NewElementMutatorFromElement(&dom.Element{Node: *n})
+	return ret
+}
+
 func (self *ElementMutator) AppendChildren(children ...dom.ToNodeConvertable) *ElementMutator {
 
 	// FIXME: append and remove operations have to be done at Node level
@@ -37,7 +42,7 @@ func (self *ElementMutator) AppendChildren(children ...dom.ToNodeConvertable) *E
 	return self
 }
 
-func (self *ElementMutator) RemoveChildren() *ElementMutator {
+func (self *ElementMutator) RemoveAllChildren() *ElementMutator {
 	self.Element.Node.RemoveAllChildren()
 	return self
 }
@@ -83,6 +88,7 @@ func (self *ElementMutator) ExternalUse(cb func(*ElementMutator)) *ElementMutato
 }
 
 func (self *ElementMutator) Call(property string, ret *interface{}, args ...interface{}) *ElementMutator {
+	// log.Println("calling", property)
 	t := self.Element.Node.Value.Call(property, args...)
 	if ret != nil {
 		*ret = t
