@@ -21,7 +21,7 @@ func (self *Node) GetFirstChild() *Node {
 	ret := (*Node)(nil)
 
 	r := self.Value.Get("firstChild")
-	if r != js.Null() {
+	if !r.IsNull() {
 		ret = &Node{r}
 	}
 
@@ -34,7 +34,7 @@ func (self *Node) RemoveChild(c *Node) *Node {
 
 func (self *Node) ParentNode() *Node {
 	t := self.Get("parentNode")
-	if t == js.Null() || t == js.Undefined() {
+	if t.IsNull() || t.IsUndefined() {
 		return nil
 	}
 	return &Node{t}
@@ -42,7 +42,7 @@ func (self *Node) ParentNode() *Node {
 
 func (self *Node) ParentElement() *Element {
 	t := self.Get("parentElement")
-	if t == js.Null() || t == js.Undefined() {
+	if t.IsNull() || t.IsUndefined() {
 		return nil
 	}
 	return &Element{Node{t}}
