@@ -5,16 +5,15 @@ import (
 )
 
 type Promise struct {
-	js.Value
+	jsvalue js.Value
 }
 
-func NewPromiseFromJSValue(value js.Value) (*Promise, error) {
-
-	self := &Promise{value}
-
+func NewPromiseFromJSValue(jsvalue js.Value) (*Promise, error) {
+	self := &Promise{jsvalue: jsvalue}
 	return self, nil
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
 func (self *Promise) Then(funcs ...js.Func) (*Promise, error) {
 
 	funcs2 := make([]interface{}, len(funcs))
@@ -23,7 +22,7 @@ func (self *Promise) Then(funcs ...js.Func) (*Promise, error) {
 		funcs2[i] = funcs[i]
 	}
 
-	ret, err := NewPromiseFromJSValue(self.Value.Call("then", funcs2...))
+	ret, err := NewPromiseFromJSValue(self.jsvalue.Call("then", funcs2...))
 	if err != nil {
 		return nil, err
 	}

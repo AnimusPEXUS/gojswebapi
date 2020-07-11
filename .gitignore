@@ -1,0 +1,4 @@
+*.wasm
+arraybuffer/examples/01/index/index
+arraybuffer/examples/01/index/tests.wasm
+blob/examples/01/index/index
