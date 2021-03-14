@@ -1,8 +1,13 @@
 package arraybuffer
 
 import (
-	"github.com/dennwc/dom/js"
+	"io"
+	"syscall/js"
+
+	"github.com/AnimusPEXUS/gojswebapi/array"
 )
+
+var _ io.Reader = &ArrayBufferReader{}
 
 type ArrayBufferReader struct {
 	ab     *ArrayBuffer
@@ -15,7 +20,7 @@ func NewArrayBufferReader(ab *ArrayBuffer) (*ArrayBufferReader, error) {
 
 	length, err := ab.Len()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	self := &ArrayBufferReader{
@@ -24,7 +29,7 @@ func NewArrayBufferReader(ab *ArrayBuffer) (*ArrayBufferReader, error) {
 		done:   0,
 	}
 
-	return self
+	return self, nil
 }
 
 func (self *ArrayBufferReader) Read(p []byte) (n int, err error) {
@@ -37,12 +42,29 @@ func (self *ArrayBufferReader) Read(p []byte) (n int, err error) {
 		if selfdonelenp > self.lenght {
 			end_index = self.done - self.lenght
 			self.EOF = true
+
 		} else {
 			end_index = selfdonelenp
 		}
 	}
 
-	self.ab.Slice(self.done, end_index)
+	slc, err := self.ab.Slice(self.done, &[]int{end_index}[0], nil)
+	if err != nil {
+		n = 0 // TODO: is this correct?
+		return
+	}
 
-	uint8array := js
+	arr, err := array.NewArray(array.ArrayTypeUint8, slc.JSValue, nil, nil)
+	if err != nil {
+		return
+	}
+
+	// TODO: probably better error checking needed
+	n = js.CopyBytesToGo(p, arr.JSValue)
+
+	if self.EOF {
+		err = io.EOF
+	}
+
+	return
 }

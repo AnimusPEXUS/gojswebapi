@@ -2,7 +2,6 @@ package arraybuffer
 
 import (
 	"errors"
-	"io"
 	"syscall/js"
 )
 
@@ -33,14 +32,12 @@ func IsArrayBuffer(value js.Value) (bool, error) {
 	return value.InstanceOf(abjv), nil
 }
 
-var _ io.Reader = &ArrayBuffer{}
-
 type ArrayBuffer struct {
-	jsvalue js.Value
+	JSValue js.Value
 }
 
 func NewArrayBufferFromJSValue(jsvalue js.Value) (*ArrayBuffer, error) {
-	self := &ArrayBuffer{jsvalue: jsvalue}
+	self := &ArrayBuffer{JSValue: jsvalue}
 	return self, nil
 }
 
@@ -61,11 +58,11 @@ func NewArrayBuffer(length int) (*ArrayBuffer, error) {
 }
 
 func (self *ArrayBuffer) IsArrayBuffer() (bool, error) {
-	return IsArrayBuffer(self.jsvalue)
+	return IsArrayBuffer(self.JSValue)
 }
 
 func (self *ArrayBuffer) Len() (int, error) {
-	return self.jsvalue.Get("byteLength").Int(), nil
+	return self.JSValue.Get("byteLength").Int(), nil
 }
 
 // TODO: maybe int64 is better solution, but I'm not sure
@@ -83,11 +80,11 @@ func (self *ArrayBuffer) Slice(begin int, end *int, contentType *string) (*Array
 		contentType_p = js.ValueOf(*contentType)
 	}
 
-	ret_array := self.jsvalue.Call("slice", begin_p, end_p, contentType_p)
+	ret_array := self.JSValue.Call("slice", begin_p, end_p, contentType_p)
 
 	return NewArrayBufferFromJSValue(ret_array)
 }
 
-func (self *ArrayBuffer) MakeReader() *ArrayBufferReader {
-	return NewArrayBufferReader()
+func (self *ArrayBuffer) MakeReader() (*ArrayBufferReader, error) {
+	return NewArrayBufferReader(self)
 }

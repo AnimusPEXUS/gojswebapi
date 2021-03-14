@@ -4,8 +4,8 @@ import (
 	"errors"
 	"syscall/js"
 
-	"github.com/AnimusPEXUS/wasmtools/arraybuffer"
-	"github.com/AnimusPEXUS/wasmtools/promise"
+	"github.com/AnimusPEXUS/gojswebapi/arraybuffer"
+	"github.com/AnimusPEXUS/gojswebapi/promise"
 )
 
 var ERR_BLOB_UNSUPPORTED = errors.New("Blob unsupported")
@@ -22,36 +22,30 @@ func IsBlob(value js.Value) (bool, error) {
 	return value.InstanceOf(GetBlobJSValue()), nil
 }
 
-var _ io.Reader = &Blob{}
-
 type Blob struct {
-	jsvalue js.Value
+	JSValue js.Value
 }
 
 func NewBlobFromJSValue(jsvalue js.Value) (*Blob, error) {
-	self := &Blob{jsvalue: jsvalue}
+	self := &Blob{JSValue: jsvalue}
 	return self, nil
 }
 
-func (self *Blob) Read(p []byte) (n int, err error) {
-
-}
-
 func (self *Blob) IsBlob() (bool, error) {
-	return IsBlob(self.jsvalue)
+	return IsBlob(self.JSValue)
 }
 
 func (self *Blob) Size() (int, error) {
-	return self.jsvalue.Get("size").Int(), nil
+	return self.JSValue.Get("size").Int(), nil
 }
 
 func (self *Blob) Type() (string, error) {
-	return self.jsvalue.Get("type").String(), nil
+	return self.JSValue.Get("type").String(), nil
 }
 
 func (self *Blob) ArrayBuffer() (*arraybuffer.ArrayBuffer, error) {
 
-	blob_arraybuffer_result := self.jsvalue.Call("arrayBuffer")
+	blob_arraybuffer_result := self.JSValue.Call("arrayBuffer")
 
 	pro, err := promise.NewPromiseFromJSValue(blob_arraybuffer_result)
 	if err != nil {
@@ -114,7 +108,7 @@ func (self *Blob) Slice(start *int, end *int, contentType *string) (*Blob, error
 		contentType_p = js.ValueOf(*contentType)
 	}
 
-	ret_blob := self.jsvalue.Call("slice", start_p, end_p, contentType_p)
+	ret_blob := self.JSValue.Call("slice", start_p, end_p, contentType_p)
 
 	return NewBlobFromJSValue(ret_blob)
 }
@@ -123,10 +117,14 @@ func (self *Blob) Slice(start *int, end *int, contentType *string) (*Blob, error
 // func (self *Blob) Stream() (*ReadableStream, error)
 
 func (self *Blob) Text() (*promise.Promise, error) {
-	blob_text_result := self.jsvalue.Call("text")
+	blob_text_result := self.JSValue.Call("text")
 	pro, err := promise.NewPromiseFromJSValue(blob_text_result)
 	if err != nil {
 		return nil, err
 	}
 	return pro, nil
+}
+
+func (self *Blob) MakeReader() (*BlobReader, error) {
+	return NewBlobReader(self)
 }
