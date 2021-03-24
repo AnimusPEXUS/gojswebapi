@@ -42,20 +42,6 @@ func NewWS(options *WSOptions) (*WS, error) {
 
 	var wsoc js.Value
 
-	if options.JSValue != nil {
-		wsoc = *options.JSValue
-		options.JSValue = &wsoc
-		options.URL = &([]string{wsoc.Get("url").String()}[0])
-	} else {
-		wsoc_go := js.Global().Get("WebSocket")
-		if wsoc_go.IsUndefined() {
-			return nil, errors.New("WebSocket is undefined")
-		}
-		url := *options.URL
-		wsoc = wsoc_go.New(url, js.Undefined()) //options.Protocols
-		options.JSValue = &wsoc
-	}
-
 	err := self.SetOnOpen(options.OnOpen)
 	if err != nil {
 		return nil, err
@@ -74,6 +60,20 @@ func NewWS(options *WSOptions) (*WS, error) {
 	err = self.SetOnError(options.OnError)
 	if err != nil {
 		return nil, err
+	}
+
+	if options.JSValue != nil {
+		wsoc = *options.JSValue
+		options.JSValue = &wsoc
+		options.URL = &([]string{wsoc.Get("url").String()}[0])
+	} else {
+		wsoc_go := js.Global().Get("WebSocket")
+		if wsoc_go.IsUndefined() {
+			return nil, errors.New("WebSocket is undefined")
+		}
+		url := *options.URL
+		wsoc = wsoc_go.New(url, js.Undefined()) //options.Protocols
+		options.JSValue = &wsoc
 	}
 
 	return self, nil
