@@ -25,3 +25,7 @@ func (self *Document) CreateElement(name string) *Element {
 func (self *Document) NewTextNode(text string) *Node {
 	return &Node{self.Value.Call("createTextNode", text)}
 }
+
+func (self *Document) GetBody() *Element {
+	return &Element{Node{self.Get("body")}}
+}
