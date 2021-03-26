@@ -10,7 +10,7 @@ type ErrorEvent struct {
 	Event
 }
 
-func NewErrorEventFromJSValue(jsvalue js.Value) (*ErrorEvent, error) {
+func NewErrorEventFromJSValue(jsvalue *js.Value) (*ErrorEvent, error) {
 	self := &ErrorEvent{}
 	r, err := NewEventFromJSValue(jsvalue)
 	if err != nil {

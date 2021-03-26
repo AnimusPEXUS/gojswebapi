@@ -3,12 +3,14 @@ package arraybuffer
 import (
 	"errors"
 	"syscall/js"
+
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 )
 
 var ERR_ARRAYBUFFER_UNSUPPORTED = errors.New("ArrayBuffer unsupported")
 
-func GetArrayBufferJSValue() (js.Value, error) {
-	return js.Global().Get("ArrayBuffer"), nil
+func GetArrayBufferJSValue() (*js.Value, error) {
+	return gojstoolsutils.JSValueLiteralToPointer(js.Global().Get("ArrayBuffer")), nil
 }
 
 func IsArrayBufferSupported() (bool, error) {
@@ -23,20 +25,20 @@ func IsArrayBufferSupported() (bool, error) {
 	return !undef, nil
 }
 
-func IsArrayBuffer(value js.Value) (bool, error) {
+func IsArrayBuffer(value *js.Value) (bool, error) {
 	abjv, err := GetArrayBufferJSValue()
 	if err != nil {
 		return false, err
 	}
 
-	return value.InstanceOf(abjv), nil
+	return value.InstanceOf(*abjv), nil
 }
 
 type ArrayBuffer struct {
-	JSValue js.Value
+	JSValue *js.Value
 }
 
-func NewArrayBufferFromJSValue(jsvalue js.Value) (*ArrayBuffer, error) {
+func NewArrayBufferFromJSValue(jsvalue *js.Value) (*ArrayBuffer, error) {
 	self := &ArrayBuffer{JSValue: jsvalue}
 	return self, nil
 }
@@ -47,7 +49,7 @@ func NewArrayBuffer(length int) (*ArrayBuffer, error) {
 		return nil, err
 	}
 
-	jsv := jsv_c.New(length)
+	jsv := gojstoolsutils.JSValueLiteralToPointer(jsv_c.New(length))
 
 	self, err := NewArrayBufferFromJSValue(jsv)
 	if err != nil {
@@ -68,7 +70,7 @@ func (self *ArrayBuffer) Len() (int, error) {
 // TODO: maybe int64 is better solution, but I'm not sure
 func (self *ArrayBuffer) Slice(begin int, end *int, contentType *string) (*ArrayBuffer, error) {
 
-	begin_p := js.ValueOf(begin)
+	begin_p := gojstoolsutils.JSValueLiteralToPointer(js.ValueOf(begin))
 	end_p := js.Undefined()
 	contentType_p := js.Undefined()
 
@@ -82,7 +84,7 @@ func (self *ArrayBuffer) Slice(begin int, end *int, contentType *string) (*Array
 
 	ret_array := self.JSValue.Call("slice", begin_p, end_p, contentType_p)
 
-	return NewArrayBufferFromJSValue(ret_array)
+	return NewArrayBufferFromJSValue(&ret_array)
 }
 
 func (self *ArrayBuffer) MakeReader() (*ArrayBufferReader, error) {

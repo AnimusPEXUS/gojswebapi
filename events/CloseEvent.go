@@ -10,7 +10,7 @@ type CloseEvent struct {
 	Event
 }
 
-func NewCloseEventFromJSValue(jsvalue js.Value) (*CloseEvent, error) {
+func NewCloseEventFromJSValue(jsvalue *js.Value) (*CloseEvent, error) {
 	self := &CloseEvent{}
 	r, err := NewEventFromJSValue(jsvalue)
 	if err != nil {

@@ -2,6 +2,8 @@ package promise
 
 import (
 	"syscall/js"
+
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 )
 
 type Promise struct {
@@ -22,7 +24,7 @@ func (self *Promise) Then(funcs ...*js.Func) (*Promise, error) {
 		funcs2[i] = funcs[i]
 	}
 
-	ret, err := NewPromiseFromJSValue(self.JSValue.Call("then", funcs2...))
+	ret, err := NewPromiseFromJSValue(gojstoolsutils.JSValueLiteralToPointer(self.JSValue.Call("then", funcs2...)))
 	if err != nil {
 		return nil, err
 	}

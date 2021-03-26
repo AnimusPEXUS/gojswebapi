@@ -1,3 +1,6 @@
+github.com/AnimusPEXUS/gojstools v0.0.0-20210326222336-a73428be970b h1:mRRqTvdWU9N5XD4kGjoKrCm1F3N0MnSz1hzb68SC6Pw=
+github.com/AnimusPEXUS/gojstools v0.0.0-20210326222336-a73428be970b/go.mod h1:P1AufQ109iiWwwCf2x10z1iFEilkD7GXIxugDYP2p9c=
+github.com/AnimusPEXUS/gojswebapi v0.0.0-20210326142835-df816a83a607/go.mod h1:P1EHlJM7sUwSurwlDErg40mG3SlR7aN/vIuoZRuGDjU=
 github.com/AnimusPEXUS/utils v0.0.0-20210324003110-4bd50c7dd42e h1:a7kJUdRHTXsaV5q+rm56k0I9by6D8yE+OiRXgUTzpx8=
 github.com/AnimusPEXUS/utils v0.0.0-20210324003110-4bd50c7dd42e/go.mod h1:s9jwdFf7uDEjVkVWVpMEZ0FKuOz6K7WHCvEg8UEf5bo=
 github.com/antchfx/htmlquery v1.2.3/go.mod h1:B0ABL+F5irhhMWg54ymEZinzMSi0Kt3I2if0BLYa3V0=

@@ -64,6 +64,6 @@ func (self *BlobReader) Read(p []byte) (n int, err error) {
 	}
 
 	// TODO: probably better error checking needed
-	n = js.CopyBytesToGo(p, arr.JSValue)
+	n = js.CopyBytesToGo(p, *arr.JSValue)
 	return
 }

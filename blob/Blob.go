@@ -4,29 +4,30 @@ import (
 	"errors"
 	"syscall/js"
 
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 	"github.com/AnimusPEXUS/gojswebapi/arraybuffer"
 	"github.com/AnimusPEXUS/gojswebapi/promise"
 )
 
 var ERR_BLOB_UNSUPPORTED = errors.New("Blob unsupported")
 
-func GetBlobJSValue() js.Value {
-	return js.Global().Get("Blob")
+func GetBlobJSValue() *js.Value {
+	return gojstoolsutils.JSValueLiteralToPointer(js.Global().Get("Blob"))
 }
 
 func IsBlobSupported() bool {
 	return !GetBlobJSValue().IsUndefined()
 }
 
-func IsBlob(value js.Value) (bool, error) {
-	return value.InstanceOf(GetBlobJSValue()), nil
+func IsBlob(value *js.Value) (bool, error) {
+	return value.InstanceOf(*GetBlobJSValue()), nil
 }
 
 type Blob struct {
-	JSValue js.Value
+	JSValue *js.Value
 }
 
-func NewBlobFromJSValue(jsvalue js.Value) (*Blob, error) {
+func NewBlobFromJSValue(jsvalue *js.Value) (*Blob, error) {
 	self := &Blob{JSValue: jsvalue}
 	return self, nil
 }
@@ -47,37 +48,42 @@ func (self *Blob) ArrayBuffer() (*arraybuffer.ArrayBuffer, error) {
 
 	blob_arraybuffer_result := self.JSValue.Call("arrayBuffer")
 
-	pro, err := promise.NewPromiseFromJSValue(blob_arraybuffer_result)
+	pro, err := promise.NewPromiseFromJSValue(&blob_arraybuffer_result)
 	if err != nil {
 		return nil, err
 	}
 
 	psucc := make(chan bool)
 	perr := make(chan bool)
-	var array_data js.Value
+	var array_data *js.Value
 
 	pro.Then(
-		js.FuncOf(func(
-			this js.Value,
-			args []js.Value,
-		) interface{} {
-			if len(args) == 0 {
-				perr <- true
-				return false
-			}
-			array_data = args[0].Get("data")
-			psucc <- true
-			return false
-		},
-		),
-		js.FuncOf(func(
-			this js.Value,
-			args []js.Value,
-		) interface{} {
-			perr <- true
-			return false
-		},
-		),
+		gojstoolsutils.JSFuncLiteralToPointer(
+			js.FuncOf(
+				func(
+					this js.Value,
+					args []js.Value,
+				) interface{} {
+					if len(args) == 0 {
+						perr <- true
+						return false
+					}
+					array_data = gojstoolsutils.JSValueLiteralToPointer(args[0].Get("data"))
+					psucc <- true
+					return false
+				},
+			)),
+
+		gojstoolsutils.JSFuncLiteralToPointer(
+			js.FuncOf(
+				func(
+					this js.Value,
+					args []js.Value,
+				) interface{} {
+					perr <- true
+					return false
+				},
+			)),
 	)
 
 	select {
@@ -110,7 +116,7 @@ func (self *Blob) Slice(start *int, end *int, contentType *string) (*Blob, error
 
 	ret_blob := self.JSValue.Call("slice", start_p, end_p, contentType_p)
 
-	return NewBlobFromJSValue(ret_blob)
+	return NewBlobFromJSValue(&ret_blob)
 }
 
 // TODO: maybe later :)
@@ -118,7 +124,7 @@ func (self *Blob) Slice(start *int, end *int, contentType *string) (*Blob, error
 
 func (self *Blob) Text() (*promise.Promise, error) {
 	blob_text_result := self.JSValue.Call("text")
-	pro, err := promise.NewPromiseFromJSValue(blob_text_result)
+	pro, err := promise.NewPromiseFromJSValue(&blob_text_result)
 	if err != nil {
 		return nil, err
 	}

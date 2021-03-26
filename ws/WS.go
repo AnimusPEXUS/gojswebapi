@@ -5,6 +5,7 @@ import (
 	"log"
 	"syscall/js"
 
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 	"github.com/AnimusPEXUS/gojswebapi/events"
 	utils_panic "github.com/AnimusPEXUS/utils/panic"
 )
@@ -40,11 +41,11 @@ func NewWS(options *WSOptions) (*WS, error) {
 		options: options,
 	}
 
-	var wsoc js.Value
+	var wsoc *js.Value
 
 	if options.JSValue != nil {
-		wsoc = *options.JSValue
-		options.JSValue = &wsoc
+		wsoc = options.JSValue
+		options.JSValue = wsoc
 		options.URL = &([]string{wsoc.Get("url").String()}[0])
 	} else {
 		wsoc_go := js.Global().Get("WebSocket")
@@ -52,8 +53,8 @@ func NewWS(options *WSOptions) (*WS, error) {
 			return nil, errors.New("WebSocket is undefined")
 		}
 		url := *options.URL
-		wsoc = wsoc_go.New(url, js.Undefined()) //options.Protocols
-		options.JSValue = &wsoc
+		wsoc = gojstoolsutils.JSValueLiteralToPointer(wsoc_go.New(url, js.Undefined())) //options.Protocols
+		options.JSValue = wsoc
 	}
 
 	err := self.SetOnOpen(options.OnOpen)
@@ -97,7 +98,7 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
 				if self.options.OnOpen != nil {
-					ev, err := events.NewEventFromJSValue(args[0])
+					ev, err := events.NewEventFromJSValue(&args[0])
 					if err != nil {
 						return err
 					}
@@ -130,7 +131,7 @@ func (self *WS) SetOnClose(f func(*events.CloseEvent)) (err error) {
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
 				if self.options.OnClose != nil {
-					ev, err := events.NewCloseEventFromJSValue(args[0])
+					ev, err := events.NewCloseEventFromJSValue(&args[0])
 					if err != nil {
 						return err
 					}
@@ -163,7 +164,7 @@ func (self *WS) SetOnMessage(f func(*events.MessageEvent)) (err error) {
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
 				if self.options.OnMessage != nil {
-					ev, err := events.NewMessageEventFromJSValue(args[0])
+					ev, err := events.NewMessageEventFromJSValue(&args[0])
 					if err != nil {
 						return err
 					}
@@ -196,7 +197,7 @@ func (self *WS) SetOnError(f func(*events.ErrorEvent)) (err error) {
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
 				if self.options.OnError != nil {
-					ev, err := events.NewErrorEventFromJSValue(args[0])
+					ev, err := events.NewErrorEventFromJSValue(&args[0])
 					if err != nil {
 						return err
 					}
@@ -233,7 +234,7 @@ func (self *WS) Close(code *int, reason *string) (err error) {
 	return nil
 }
 
-func (self *WS) Send(value js.Value) (err error) {
+func (self *WS) Send(value *js.Value) (err error) {
 	log.Print("WS Send called")
 	defer func() {
 		err = utils_panic.PanicToError()

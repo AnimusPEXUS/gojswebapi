@@ -2,6 +2,8 @@ package dom
 
 import (
 	"syscall/js"
+
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 )
 
 type ToNodeConvertable interface {
@@ -13,7 +15,7 @@ type Node struct {
 }
 
 func (self *Node) AppendChild(node *Node) *Node {
-	return &Node{&[]js.Value{self.JSValue.Call("appendChild", node)}[0]}
+	return &Node{gojstoolsutils.JSValueLiteralToPointer(self.JSValue.Call("appendChild", node))}
 }
 
 func (self *Node) GetFirstChild() *Node {
@@ -29,7 +31,7 @@ func (self *Node) GetFirstChild() *Node {
 }
 
 func (self *Node) RemoveChild(c *Node) *Node {
-	return &Node{self.JSValue.Call("removeChild", c.JSValue)}
+	return &Node{gojstoolsutils.JSValueLiteralToPointer(self.JSValue.Call("removeChild", c.JSValue))}
 }
 
 func (self *Node) ParentNode() *Node {

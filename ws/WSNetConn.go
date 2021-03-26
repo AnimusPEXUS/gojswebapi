@@ -11,14 +11,12 @@ import (
 	"syscall/js"
 	"time"
 
-	"github.com/AnimusPEXUS/gojswebapi/events"
-
-	"github.com/AnimusPEXUS/utils/worker"
-
+	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 	"github.com/AnimusPEXUS/gojswebapi/array"
-
 	wasmtools_arraybuffer "github.com/AnimusPEXUS/gojswebapi/arraybuffer"
 	wasmtools_blob "github.com/AnimusPEXUS/gojswebapi/blob"
+	"github.com/AnimusPEXUS/gojswebapi/events"
+	"github.com/AnimusPEXUS/utils/worker"
 )
 
 type EmptyStruct struct{}
@@ -48,7 +46,7 @@ type WSNetConn struct {
 
 	read_buffer *bytes.Buffer
 
-	inbound_messages       []js.Value
+	inbound_messages       []*js.Value
 	inbound_messages_mutex sync.Mutex
 	inbound_worker         *worker.Worker
 	inbound_signal         chan EmptyStruct
@@ -68,7 +66,7 @@ func NewWSNetConn(options *WSNetConnOptions) *WSNetConn {
 	self := &WSNetConn{
 		options:          options,
 		read_buffer:      nil,
-		inbound_messages: make([]js.Value, 0),
+		inbound_messages: make([]*js.Value, 0),
 		// outbound_messages: make([]js.Value, 0),
 		inbound_signal: make(chan EmptyStruct),
 		// outbound_signal:   make(chan EmptyStruct),
@@ -400,7 +398,7 @@ func (self *WSNetConn) Write(b []byte) (n int, err error) {
 
 	bval, err := array.NewArray(
 		array.ArrayTypeUint8,
-		js.ValueOf(len(b)),
+		gojstoolsutils.JSValueLiteralToPointer(js.ValueOf(len(b))),
 		nil,
 		nil,
 	)
@@ -408,7 +406,7 @@ func (self *WSNetConn) Write(b []byte) (n int, err error) {
 		return
 	}
 
-	js.CopyBytesToJS(bval.JSValue, b)
+	js.CopyBytesToJS(*bval.JSValue, b)
 
 	log.Println("sending...")
 	err = self.options.WS.Send(bval.JSValue)
