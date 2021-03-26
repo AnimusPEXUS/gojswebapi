@@ -5,17 +5,16 @@ package dom
 // )
 
 type Element struct {
-	// js.Value
-	Node
+	Node *Node
 }
 
 func (self *Element) Append(node *Node) {
-	self.Call("append", node)
+	self.Node.JSValue.Call("append", node)
 }
 
 func (self *Element) Remove() {
 	// NOTE: this removes Element it self from it's parent
-	self.Call("remove")
+	self.Node.JSValue.Call("remove")
 }
 
 func (self *Element) RemoveChild(node *Node) {
@@ -32,15 +31,15 @@ func (self *Element) ParentElement() *Element {
 }
 
 func (self *Element) AsNode() *Node {
-	return &Node{self.Value}
+	return &Node{self.Node.JSValue}
 }
 
 func (self *Element) SetAttribute(name string, value string) {
-	self.Call("setAttribute", name, value)
+	self.Node.JSValue.Call("setAttribute", name, value)
 }
 
 func (self *Element) SetAttributeNS(namespace string, name string, value string) {
-	self.Call("setAttributeNS", namespace, name, value)
+	self.Node.JSValue.Call("setAttributeNS", namespace, name, value)
 }
 
 // type Attribute struct {

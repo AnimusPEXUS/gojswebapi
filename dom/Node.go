@@ -9,43 +9,43 @@ type ToNodeConvertable interface {
 }
 
 type Node struct {
-	js.Value
+	JSValue *js.Value
 }
 
 func (self *Node) AppendChild(node *Node) *Node {
-	return &Node{self.Call("appendChild", node)}
+	return &Node{&[]js.Value{self.JSValue.Call("appendChild", node)}[0]}
 }
 
 func (self *Node) GetFirstChild() *Node {
 
 	ret := (*Node)(nil)
 
-	r := self.Value.Get("firstChild")
+	r := self.JSValue.Get("firstChild")
 	if !r.IsNull() {
-		ret = &Node{r}
+		ret = &Node{&r}
 	}
 
 	return ret
 }
 
 func (self *Node) RemoveChild(c *Node) *Node {
-	return &Node{self.Value.Call("removeChild", c.Value)}
+	return &Node{self.JSValue.Call("removeChild", c.JSValue)}
 }
 
 func (self *Node) ParentNode() *Node {
-	t := self.Get("parentNode")
+	t := self.JSValue.Get("parentNode")
 	if t.IsNull() || t.IsUndefined() {
 		return nil
 	}
-	return &Node{t}
+	return &Node{&t}
 }
 
 func (self *Node) ParentElement() *Element {
-	t := self.Get("parentElement")
+	t := self.JSValue.Get("parentElement")
 	if t.IsNull() || t.IsUndefined() {
 		return nil
 	}
-	return &Element{Node{t}}
+	return &Element{&Node{&t}}
 }
 
 func (self *Node) AsNode() *Node {
