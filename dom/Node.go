@@ -15,7 +15,7 @@ type Node struct {
 }
 
 func (self *Node) AppendChild(node *Node) *Node {
-	return &Node{gojstoolsutils.JSValueLiteralToPointer(self.JSValue.Call("appendChild", node))}
+	return &Node{gojstoolsutils.JSValueLiteralToPointer(self.JSValue.Call("appendChild", *node.JSValue))}
 }
 
 func (self *Node) GetFirstChild() *Node {
