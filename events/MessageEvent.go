@@ -50,19 +50,19 @@ func (self *MessageEvent) GetLastEventId() (ret string, err error) {
 }
 
 // TODO: work required
-func (self *MessageEvent) GetSource() (ret js.Value, err error) {
+func (self *MessageEvent) GetSource() (ret *js.Value, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.Event.JSValue.Get("source")
+	ret = gojstoolsutils.JSValueLiteralToPointer(self.Event.JSValue.Get("source"))
 	return ret, nil
 }
 
 // TODO: work required
-func (self *MessageEvent) GetPorts() (ret js.Value, err error) {
+func (self *MessageEvent) GetPorts() (ret *js.Value, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.Event.JSValue.Get("ports")
+	ret = gojstoolsutils.JSValueLiteralToPointer(self.Event.JSValue.Get("ports"))
 	return ret, nil
 }
