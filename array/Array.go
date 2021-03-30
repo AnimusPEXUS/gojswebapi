@@ -143,3 +143,7 @@ func NewArrayFromJSValue(value *js.Value) (self *Array, err error) {
 	self = &Array{JSValue: value}
 	return self, nil
 }
+
+func (self *Array) ToString() string {
+	return self.JSValue.Call("toString").String()
+}
