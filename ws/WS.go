@@ -239,7 +239,7 @@ func (self *WS) Send(value *js.Value) (err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	self.options.JSValue.Call("send", value)
+	self.options.JSValue.Call("send", *value)
 	return
 }
 
