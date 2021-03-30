@@ -57,10 +57,9 @@ func NewWS(options *WSOptions) (*WS, error) {
 			return nil, errors.New("WebSocket is undefined")
 		}
 		url := *options.URL
-		wsoc := gojstoolsutils.JSValueLiteralToPointer(
-			wsoc_constr.New(url, js.Undefined()),
-		) // TODO: options.Protocols
-		self.JSValue = wsoc
+		wsoc := wsoc_constr.New(url, js.Undefined()) // TODO: options.Protocols
+		self.JSValue = &wsoc
+		self.JSValue.Call("send", `{"method":"NewSession","params":"\u003cobject\u003e","id":0,"jsonrpc":"2.0"}`)
 	}
 
 	err := self.SetOnOpen(options.OnOpen)
