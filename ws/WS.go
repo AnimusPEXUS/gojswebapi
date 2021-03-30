@@ -245,11 +245,17 @@ func (self *WS) Send(value *js.Value) (err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	// log.Println("self", self)
-	// log.Println("self.JSValue", self.JSValue)
-	// log.Println("self.options.JSValue", self.options.JSValue.Call("send", "123123"))
-	// log.Println("self.options.JSValue 2", self.options.JSValue.String())
-	self.JSValue.Call("send", *value)
+
+	state, _ := self.ReadyStateGet()
+	log.Println("ws state", state)
+	url, _ := self.URLGet()
+	log.Println("ws url", url)
+
+	v := *value
+
+	log.Println("value v:", v.Call("toString").String())
+
+	self.JSValue.Call("send", v)
 	return
 }
 
