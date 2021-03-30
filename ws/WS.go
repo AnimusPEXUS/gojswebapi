@@ -21,7 +21,8 @@ const (
 
 // if both url and js_value are specified, js_value is used
 type WSOptions struct {
-	URL       *string
+	URL *string
+	// to use existing ws
 	JSValue   *js.Value
 	Protocols []string
 
@@ -32,29 +33,34 @@ type WSOptions struct {
 }
 
 type WS struct {
+	JSValue *js.Value
 	options *WSOptions
 }
 
 func NewWS(options *WSOptions) (*WS, error) {
 
+	if (options.JSValue == nil && options.URL == nil) ||
+		(options.JSValue != nil && options.URL != nil) {
+		panic("existing socket _or_ url must be supplied")
+	}
+
 	self := &WS{
 		options: options,
 	}
 
-	var wsoc *js.Value
-
 	if options.JSValue != nil {
-		wsoc = options.JSValue
-		options.JSValue = wsoc
-		options.URL = &([]string{wsoc.Get("url").String()}[0])
+		self.JSValue = options.JSValue
+		options.URL = &([]string{self.JSValue.Get("url").String()}[0])
 	} else {
-		wsoc_go := js.Global().Get("WebSocket")
-		if wsoc_go.IsUndefined() {
+		wsoc_constr := js.Global().Get("WebSocket")
+		if wsoc_constr.IsUndefined() {
 			return nil, errors.New("WebSocket is undefined")
 		}
 		url := *options.URL
-		wsoc = gojstoolsutils.JSValueLiteralToPointer(wsoc_go.New(url, js.Undefined())) //options.Protocols
-		options.JSValue = wsoc
+		wsoc := gojstoolsutils.JSValueLiteralToPointer(
+			wsoc_constr.New(url, js.Undefined()),
+		) // TODO: options.Protocols
+		self.JSValue = wsoc
 	}
 
 	err := self.SetOnOpen(options.OnOpen)
@@ -86,14 +92,14 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 	}()
 
 	if f == nil {
-		self.options.JSValue.Set("onopen", js.Undefined())
+		self.JSValue.Set("onopen", js.Undefined())
 		self.options.OnOpen = nil
 		return
 	}
 
 	self.options.OnOpen = f
 
-	self.options.JSValue.Set(
+	self.JSValue.Set(
 		"onopen",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
@@ -119,14 +125,14 @@ func (self *WS) SetOnClose(f func(*events.CloseEvent)) (err error) {
 	}()
 
 	if f == nil {
-		self.options.JSValue.Set("onclose", js.Undefined())
+		self.JSValue.Set("onclose", js.Undefined())
 		self.options.OnOpen = nil
 		return
 	}
 
 	self.options.OnClose = f
 
-	self.options.JSValue.Set(
+	self.JSValue.Set(
 		"onclose",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
@@ -152,14 +158,14 @@ func (self *WS) SetOnMessage(f func(*events.MessageEvent)) (err error) {
 	}()
 
 	if f == nil {
-		self.options.JSValue.Set("onmessage", js.Undefined())
+		self.JSValue.Set("onmessage", js.Undefined())
 		self.options.OnOpen = nil
 		return
 	}
 
 	self.options.OnMessage = f
 
-	self.options.JSValue.Set(
+	self.JSValue.Set(
 		"onmessage",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
@@ -185,14 +191,14 @@ func (self *WS) SetOnError(f func(*events.ErrorEvent)) (err error) {
 	}()
 
 	if f == nil {
-		self.options.JSValue.Set("onerror", js.Undefined())
+		self.JSValue.Set("onerror", js.Undefined())
 		self.options.OnOpen = nil
 		return
 	}
 
 	self.options.OnError = f
 
-	self.options.JSValue.Set(
+	self.JSValue.Set(
 		"onerror",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
@@ -230,7 +236,7 @@ func (self *WS) Close(code *int, reason *string) (err error) {
 		}
 	}
 
-	self.options.JSValue.Call("close", args...)
+	self.JSValue.Call("close", args...)
 	return nil
 }
 
@@ -239,11 +245,11 @@ func (self *WS) Send(value *js.Value) (err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	log.Println("self", self)
-	log.Println("self.options", self.options)
-	log.Println("self.options.JSValue", self.options.JSValue)
-	log.Println("self.options.JSValue 2", self.options.JSValue.String())
-	self.options.JSValue.Call("send", *value)
+	// log.Println("self", self)
+	// log.Println("self.JSValue", self.JSValue)
+	// log.Println("self.options.JSValue", self.options.JSValue.Call("send", "123123"))
+	// log.Println("self.options.JSValue 2", self.options.JSValue.String())
+	self.JSValue.Call("send", *value)
 	return
 }
 
@@ -253,7 +259,7 @@ func (self *WS) BinaryTypeGet() (ret string, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.options.JSValue.Get("binaryType").String()
+	ret = self.JSValue.Get("binaryType").String()
 	return
 }
 
@@ -261,7 +267,7 @@ func (self *WS) BinaryTypeSet(value string) (err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	self.options.JSValue.Set("binaryType", value)
+	self.JSValue.Set("binaryType", value)
 	return
 }
 
@@ -269,7 +275,7 @@ func (self *WS) BufferedAmountGet() (ret int, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.options.JSValue.Get("bufferedAmount").Int()
+	ret = self.JSValue.Get("bufferedAmount").Int()
 	return
 }
 
@@ -277,7 +283,7 @@ func (self *WS) ProtocolGet() (ret string, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.options.JSValue.Get("protocol").String()
+	ret = self.JSValue.Get("protocol").String()
 	return
 }
 
@@ -285,7 +291,7 @@ func (self *WS) ReadyStateGet() (ret WSReadyState, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = WSReadyState(self.options.JSValue.Get("readyState").Int())
+	ret = WSReadyState(self.JSValue.Get("readyState").Int())
 	return
 }
 
@@ -293,6 +299,6 @@ func (self *WS) URLGet() (ret string, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
-	ret = self.options.JSValue.Get("url").String()
+	ret = self.JSValue.Get("url").String()
 	return
 }
