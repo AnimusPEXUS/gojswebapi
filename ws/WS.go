@@ -5,7 +5,7 @@ import (
 	"log"
 	"syscall/js"
 
-	gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
+	// gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
 	"github.com/AnimusPEXUS/gojswebapi/events"
 	utils_panic "github.com/AnimusPEXUS/utils/panic"
 )
