@@ -2,7 +2,6 @@ package ws
 
 import (
 	"errors"
-	"log"
 	"syscall/js"
 
 	// gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
@@ -59,7 +58,6 @@ func NewWS(options *WSOptions) (*WS, error) {
 		url := *options.URL
 		wsoc := wsoc_constr.New(url, js.Undefined()) // TODO: options.Protocols
 		self.JSValue = &wsoc
-		wsoc.Call("send", `{"method":"NewSession","params":"\u003cobject\u003e","id":0,"jsonrpc":"2.0"}`)
 	}
 
 	err := self.SetOnOpen(options.OnOpen)
@@ -240,21 +238,25 @@ func (self *WS) Close(code *int, reason *string) (err error) {
 }
 
 func (self *WS) Send(value *js.Value) (err error) {
-	log.Print("WS Send called")
+	// log.Print("WS Send called")
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
 
 	state, _ := self.ReadyStateGet()
-	log.Println("ws state", state)
-	url, _ := self.URLGet()
-	log.Println("ws url", url)
+	if state != WSReadyState_OPEN {
+		err = errors.New("ws: socket is not open")
+		return
+	}
+	// log.Println("ws state", state)
+	// url, _ := self.URLGet()
+	// log.Println("ws url", url)
 
-	v := *value
+	// v := *value
 
-	log.Println("value v:", v.Call("toString").String())
+	// log.Println("value v:", v.Call("toString").String())
 
-	self.JSValue.Call("send", v)
+	self.JSValue.Call("send", *value)
 	return
 }
 
