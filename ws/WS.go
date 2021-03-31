@@ -2,6 +2,7 @@ package ws
 
 import (
 	"errors"
+	"log"
 	"syscall/js"
 
 	// gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
@@ -100,6 +101,7 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 		"onopen",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
+				log.Println("WS: onopen called")
 				if self.options.OnOpen != nil {
 					ev, err := events.NewEventFromJSValue(&args[0])
 					if err != nil {
