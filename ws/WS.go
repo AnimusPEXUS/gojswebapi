@@ -105,7 +105,8 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 				if self.options.OnOpen != nil {
 					ev, err := events.NewEventFromJSValue(&args[0])
 					if err != nil {
-						return err
+						log.Println("error: onopen: events.NewEventFromJSValue:", err.Error())
+						return nil
 					}
 					self.options.OnOpen(ev)
 				} else {
@@ -138,7 +139,8 @@ func (self *WS) SetOnClose(f func(*events.CloseEvent)) (err error) {
 				if self.options.OnClose != nil {
 					ev, err := events.NewCloseEventFromJSValue(&args[0])
 					if err != nil {
-						return err
+						log.Println("error: onclose: events.NewCloseEventFromJSValue:", err.Error())
+						return nil
 					}
 					self.options.OnClose(ev)
 				} else {
@@ -171,7 +173,8 @@ func (self *WS) SetOnMessage(f func(*events.MessageEvent)) (err error) {
 				if self.options.OnMessage != nil {
 					ev, err := events.NewMessageEventFromJSValue(&args[0])
 					if err != nil {
-						return err
+						log.Println("error: onmessage: events.NewMessageEventFromJSValue:", err.Error())
+						return nil
 					}
 					self.options.OnMessage(ev)
 				} else {
@@ -204,7 +207,8 @@ func (self *WS) SetOnError(f func(*events.ErrorEvent)) (err error) {
 				if self.options.OnError != nil {
 					ev, err := events.NewErrorEventFromJSValue(&args[0])
 					if err != nil {
-						return err
+						log.Println("error: onerror: events.NewErrorEventFromJSValue:", err.Error())
+						return nil
 					}
 					self.options.OnError(ev)
 				} else {
