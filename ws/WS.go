@@ -2,7 +2,6 @@ package ws
 
 import (
 	"errors"
-	"log"
 	"syscall/js"
 
 	// gojstoolsutils "github.com/AnimusPEXUS/gojstools/utils"
@@ -59,6 +58,7 @@ func NewWS(options *WSOptions) (*WS, error) {
 		url := *options.URL
 		wsoc := wsoc_constr.New(url, js.Undefined()) // TODO: options.Protocols
 		self.JSValue = &wsoc
+		// options.JSValue = self.JSValue
 	}
 
 	err := self.SetOnOpen(options.OnOpen)
@@ -101,16 +101,12 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 		"onopen",
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
-				log.Println("WS: onopen called")
-				log.Println("self.options.OnOpen != nil", self.options.OnOpen != nil)
 				if self.options.OnOpen != nil {
 					ev, err := events.NewEventFromJSValue(&args[0])
 					if err != nil {
-						log.Println("error: onopen: events.NewEventFromJSValue:", err.Error())
 						return nil
 					}
-					log.Println("self.options.OnOpen()")
-					self.options.OnOpen(ev)
+					go self.options.OnOpen(ev)
 				} else {
 					self.SetOnOpen(nil)
 				}
@@ -128,7 +124,7 @@ func (self *WS) SetOnClose(f func(*events.CloseEvent)) (err error) {
 
 	if f == nil {
 		self.JSValue.Set("onclose", js.Undefined())
-		self.options.OnOpen = nil
+		self.options.OnClose = nil
 		return
 	}
 
@@ -141,10 +137,9 @@ func (self *WS) SetOnClose(f func(*events.CloseEvent)) (err error) {
 				if self.options.OnClose != nil {
 					ev, err := events.NewCloseEventFromJSValue(&args[0])
 					if err != nil {
-						log.Println("error: onclose: events.NewCloseEventFromJSValue:", err.Error())
 						return nil
 					}
-					self.options.OnClose(ev)
+					go self.options.OnClose(ev)
 				} else {
 					self.SetOnClose(nil)
 				}
@@ -162,7 +157,7 @@ func (self *WS) SetOnMessage(f func(*events.MessageEvent)) (err error) {
 
 	if f == nil {
 		self.JSValue.Set("onmessage", js.Undefined())
-		self.options.OnOpen = nil
+		self.options.OnMessage = nil
 		return
 	}
 
@@ -175,10 +170,9 @@ func (self *WS) SetOnMessage(f func(*events.MessageEvent)) (err error) {
 				if self.options.OnMessage != nil {
 					ev, err := events.NewMessageEventFromJSValue(&args[0])
 					if err != nil {
-						log.Println("error: onmessage: events.NewMessageEventFromJSValue:", err.Error())
 						return nil
 					}
-					self.options.OnMessage(ev)
+					go self.options.OnMessage(ev)
 				} else {
 					self.SetOnMessage(nil)
 				}
@@ -196,7 +190,7 @@ func (self *WS) SetOnError(f func(*events.ErrorEvent)) (err error) {
 
 	if f == nil {
 		self.JSValue.Set("onerror", js.Undefined())
-		self.options.OnOpen = nil
+		self.options.OnError = nil
 		return
 	}
 
@@ -209,10 +203,9 @@ func (self *WS) SetOnError(f func(*events.ErrorEvent)) (err error) {
 				if self.options.OnError != nil {
 					ev, err := events.NewErrorEventFromJSValue(&args[0])
 					if err != nil {
-						log.Println("error: onerror: events.NewErrorEventFromJSValue:", err.Error())
 						return nil
 					}
-					self.options.OnError(ev)
+					go self.options.OnError(ev)
 				} else {
 					self.SetOnError(nil)
 				}
