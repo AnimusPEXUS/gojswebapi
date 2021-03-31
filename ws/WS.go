@@ -102,12 +102,14 @@ func (self *WS) SetOnOpen(f func(*events.Event)) (err error) {
 		js.FuncOf(
 			func(this js.Value, args []js.Value) interface{} {
 				log.Println("WS: onopen called")
+				log.Println("self.options.OnOpen != nil", self.options.OnOpen != nil)
 				if self.options.OnOpen != nil {
 					ev, err := events.NewEventFromJSValue(&args[0])
 					if err != nil {
 						log.Println("error: onopen: events.NewEventFromJSValue:", err.Error())
 						return nil
 					}
+					log.Println("self.options.OnOpen()")
 					self.options.OnOpen(ev)
 				} else {
 					self.SetOnOpen(nil)
