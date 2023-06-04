@@ -8,14 +8,14 @@ import (
 )
 
 type Window struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
 func NewWindowFromGlobalThis() (*Window, error) {
 	return NewWindowFromJSValue(gojstoolsutils.JSValueLiteralToPointer(js.Global()))
 }
 
-func NewWindowFromJSValue(value *js.Value) (*Window, error) {
+func NewWindowFromJSValue(value js.Value) (*Window, error) {
 	self := &Window{}
 	self.JSValue = value
 	return self, nil

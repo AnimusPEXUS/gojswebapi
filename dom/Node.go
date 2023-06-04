@@ -11,7 +11,7 @@ type ToNodeConvertable interface {
 }
 
 type Node struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
 func (self *Node) AppendChild(node *Node) *Node {

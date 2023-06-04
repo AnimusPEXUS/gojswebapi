@@ -22,7 +22,7 @@ const (
 type WSOptions struct {
 	URL *string
 	// to use existing ws
-	JSValue   *js.Value
+	JSValue   js.Value
 	Protocols []string
 
 	OnClose   func(*events.CloseEvent)   // function(event)
@@ -32,7 +32,7 @@ type WSOptions struct {
 }
 
 type WS struct {
-	JSValue *js.Value
+	JSValue js.Value
 	options *WSOptions
 }
 
@@ -238,7 +238,7 @@ func (self *WS) Close(code *int, reason *string) (err error) {
 	return nil
 }
 
-func (self *WS) Send(value *js.Value) (err error) {
+func (self *WS) Send(value js.Value) (err error) {
 	// log.Print("WS Send called")
 	defer func() {
 		err = utils_panic.PanicToError()

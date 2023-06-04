@@ -10,11 +10,11 @@ import (
 
 var ERR_ARRAY_UNSUPPORTED = errors.New("Array unsupported")
 
-func GetArrayJSValue(type_ ArrayType) (*js.Value, error) {
+func GetArrayJSValue(type_ ArrayType) (js.Value, error) {
 	return gojstoolsutils.JSValueLiteralToPointer(js.Global().Get(type_.String())), nil
 }
 
-func DetermineArrayType(v *js.Value) *ArrayType {
+func DetermineArrayType(v js.Value) *ArrayType {
 	ret := (*ArrayType)(nil)
 	for _, i := range ArrayTypes {
 		global_array_type := js.Global().Get(i.String())
@@ -65,14 +65,14 @@ var ArrayTypes = []ArrayType{
 }
 
 type Array struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
 func NewArray(
 	array_type ArrayType,
-	length_typedArray_object_or_buffer *js.Value,
-	byteOffset *js.Value,
-	length *js.Value,
+	length_typedArray_object_or_buffer js.Value,
+	byteOffset js.Value,
+	length js.Value,
 ) (self *Array, err error) {
 
 	defer func() {
@@ -119,7 +119,7 @@ func NewArray(
 	return self, err
 }
 
-func NewArrayFromJSValue(value *js.Value) (self *Array, err error) {
+func NewArrayFromJSValue(value js.Value) (self *Array, err error) {
 
 	defer func() {
 		err = utils_panic.PanicToError()

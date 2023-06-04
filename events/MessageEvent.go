@@ -11,7 +11,7 @@ type MessageEvent struct {
 	Event
 }
 
-func NewMessageEventFromJSValue(jsvalue *js.Value) (*MessageEvent, error) {
+func NewMessageEventFromJSValue(jsvalue js.Value) (*MessageEvent, error) {
 	self := &MessageEvent{}
 	r, err := NewEventFromJSValue(jsvalue)
 	if err != nil {
@@ -24,7 +24,7 @@ func NewMessageEventFromJSValue(jsvalue *js.Value) (*MessageEvent, error) {
 // https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/data
 // says data can be of any type, so, probably, user have to decide what to do
 // with it
-func (self *MessageEvent) GetData() (ret *js.Value, err error) {
+func (self *MessageEvent) GetData() (ret js.Value, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
@@ -50,7 +50,7 @@ func (self *MessageEvent) GetLastEventId() (ret string, err error) {
 }
 
 // TODO: work required
-func (self *MessageEvent) GetSource() (ret *js.Value, err error) {
+func (self *MessageEvent) GetSource() (ret js.Value, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()
@@ -59,7 +59,7 @@ func (self *MessageEvent) GetSource() (ret *js.Value, err error) {
 }
 
 // TODO: work required
-func (self *MessageEvent) GetPorts() (ret *js.Value, err error) {
+func (self *MessageEvent) GetPorts() (ret js.Value, err error) {
 	defer func() {
 		err = utils_panic.PanicToError()
 	}()

@@ -11,7 +11,7 @@ import (
 
 var ERR_BLOB_UNSUPPORTED = errors.New("Blob unsupported")
 
-func GetBlobJSValue() *js.Value {
+func GetBlobJSValue() js.Value {
 	return gojstoolsutils.JSValueLiteralToPointer(js.Global().Get("Blob"))
 }
 
@@ -19,15 +19,15 @@ func IsBlobSupported() bool {
 	return !GetBlobJSValue().IsUndefined()
 }
 
-func IsBlob(value *js.Value) (bool, error) {
+func IsBlob(value js.Value) (bool, error) {
 	return value.InstanceOf(*GetBlobJSValue()), nil
 }
 
 type Blob struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
-func NewBlobFromJSValue(jsvalue *js.Value) (*Blob, error) {
+func NewBlobFromJSValue(jsvalue js.Value) (*Blob, error) {
 	self := &Blob{JSValue: jsvalue}
 	return self, nil
 }
@@ -55,7 +55,7 @@ func (self *Blob) ArrayBuffer() (*arraybuffer.ArrayBuffer, error) {
 
 	psucc := make(chan bool)
 	perr := make(chan bool)
-	var array_data *js.Value
+	var array_data js.Value
 
 	pro.Then(
 		gojstoolsutils.JSFuncLiteralToPointer(

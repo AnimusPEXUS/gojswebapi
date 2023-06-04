@@ -9,7 +9,7 @@ import (
 
 var ERR_ARRAYBUFFER_UNSUPPORTED = errors.New("ArrayBuffer unsupported")
 
-func GetArrayBufferJSValue() (*js.Value, error) {
+func GetArrayBufferJSValue() (js.Value, error) {
 	return gojstoolsutils.JSValueLiteralToPointer(js.Global().Get("ArrayBuffer")), nil
 }
 
@@ -25,7 +25,7 @@ func IsArrayBufferSupported() (bool, error) {
 	return !undef, nil
 }
 
-func IsArrayBuffer(value *js.Value) (bool, error) {
+func IsArrayBuffer(value js.Value) (bool, error) {
 	abjv, err := GetArrayBufferJSValue()
 	if err != nil {
 		return false, err
@@ -35,10 +35,10 @@ func IsArrayBuffer(value *js.Value) (bool, error) {
 }
 
 type ArrayBuffer struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
-func NewArrayBufferFromJSValue(jsvalue *js.Value) (*ArrayBuffer, error) {
+func NewArrayBufferFromJSValue(jsvalue js.Value) (*ArrayBuffer, error) {
 	self := &ArrayBuffer{JSValue: jsvalue}
 	return self, nil
 }

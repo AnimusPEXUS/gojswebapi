@@ -7,10 +7,10 @@ import (
 )
 
 type Promise struct {
-	JSValue *js.Value
+	JSValue js.Value
 }
 
-func NewPromiseFromJSValue(jsvalue *js.Value) (*Promise, error) {
+func NewPromiseFromJSValue(jsvalue js.Value) (*Promise, error) {
 	self := &Promise{JSValue: jsvalue}
 	return self, nil
 }

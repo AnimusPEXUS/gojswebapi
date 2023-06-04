@@ -46,7 +46,7 @@ type WSNetConn struct {
 
 	read_buffer *bytes.Buffer
 
-	inbound_messages       []*js.Value
+	inbound_messages       []js.Value
 	inbound_messages_mutex sync.Mutex
 	inbound_worker         *worker.Worker
 	inbound_signal         chan EmptyStruct
@@ -66,7 +66,7 @@ func NewWSNetConn(options *WSNetConnOptions) *WSNetConn {
 	self := &WSNetConn{
 		options:          options,
 		read_buffer:      nil,
-		inbound_messages: make([]*js.Value, 0),
+		inbound_messages: make([]js.Value, 0),
 		// outbound_messages: make([]js.Value, 0),
 		inbound_signal: make(chan EmptyStruct),
 		// outbound_signal:   make(chan EmptyStruct),
